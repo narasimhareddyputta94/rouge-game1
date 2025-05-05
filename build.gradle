@@ -1,52 +1,32 @@
 plugins {
-    id 'java'
-}
-
-group = 'org.example'
-version = '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-}
-
-test {
-    useJUnitPlatform()
-}plugins {
     id 'application'
-    id 'java'
 }
-
-group = 'com.roguegame'
-version = '1.0'
-
-sourceCompatibility = '17'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'org.openjfx:javafx-controls:17'
-    implementation 'org.openjfx:javafx-fxml:17'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+    implementation 'org.openjfx:javafx-controls:17.0.2'
+    implementation 'org.openjfx:javafx-fxml:17.0.2'
 }
 
 application {
-    mainClass = 'com.roguegame.Main'
+    mainClass = 'com.roguegame.MapBoundaryGame'  // or 'Main' if you're testing setup
 }
 
-test {
-    useJUnitPlatform()
-}
+def javafxPath = "C:/Users/naras/Downloads/openjfx-17.0.15_windows-x64_bin-sdk/javafx-sdk-17.0.15/lib"
 
 run {
-    jvmArgs += [
-            '--module-path', "${System.properties['java.home']}/lib",
-            '--add-modules', 'javafx.controls,javafx.fxml'
+    jvmArgs = [
+            "--module-path", javafxPath,
+            "--add-modules", "javafx.controls,javafx.fxml"
+    ]
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += [
+            "--module-path", javafxPath,
+            "--add-modules", "javafx.controls,javafx.fxml"
     ]
 }
