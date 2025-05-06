@@ -153,6 +153,23 @@ public class MapBoundaryGame extends Application {
                     }
                 }
             }
+
+            if (inCombat && event.getCode().toString().equals("SPACE") && activeMonster != null) {
+                activeMonster.damage(10);
+
+                root.getChildren().removeIf(n -> n.getId() != null && n.getId().equals("dialogue-box"));
+
+                if (!activeMonster.isAlive()) {
+                    showDialogue(root, "You defeated the " + activeMonster.getName() + "!");
+                    inCombat = false;
+                    activeMonster = null;
+                } else {
+                    showDialogue(root, "You hit the " + activeMonster.getName() + "! Remaining HP: " + activeMonster.getHealth());
+                }
+
+                drawMap(gc);
+            }
+
         });
 
         primaryStage.setTitle("JavaFX Rogue Game – Multi Monster Dialogue");
