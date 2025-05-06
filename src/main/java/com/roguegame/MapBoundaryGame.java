@@ -27,6 +27,11 @@ public class MapBoundaryGame extends Application {
     private final int cols = 15;
     private int playerX = 1;
     private int playerY = 1;
+    private int monsterX = 3;
+    private int monsterY = 3;
+    private boolean monsterAlive = true;
+    private boolean inCombat = false;
+
 
     private int health = 100;
     private final int[][] map = {
@@ -105,7 +110,6 @@ public class MapBoundaryGame extends Application {
                 health = Math.max(0, health - 10);
                 hpLabel.setText("❤ Health: " + health + " / 100");
 
-                // Animate smooth progress bar reduction
                 double progress = health / 100.0;
                 Timeline timeline = new Timeline(
                         new KeyFrame(Duration.seconds(0.2),
@@ -136,7 +140,22 @@ public class MapBoundaryGame extends Application {
             }
 
             drawMap(gc);
+
+            if (!inCombat && monsterAlive && playerX == monsterX && playerY == monsterY) {
+                inCombat = true;
+                showDialogue(root, "You encountered a Goblin! Press SPACE to attack.");
+            }
+
+            if (inCombat && event.getCode().toString().equals("SPACE")) {
+                monsterAlive = false;
+                inCombat = false;
+
+                root.getChildren().removeIf(node -> node.getId() != null && node.getId().equals("dialogue-box"));
+                showDialogue(root, "You defeated the Goblin!");
+                drawMap(gc);
+            }
         });
+
 
         primaryStage.setTitle("JavaFX Rogue Game – Beautiful HP UI");
         primaryStage.setScene(scene);
@@ -155,13 +174,30 @@ public class MapBoundaryGame extends Application {
         double py = playerY * tileSize + 5;
         double size = tileSize - 10;
 
+        if (monsterAlive) {
+            gc.setFill(Color.CRIMSON);
+            gc.fillOval(monsterX * tileSize + 5, monsterY * tileSize + 5, tileSize - 10, tileSize - 10);
+        }
+
         gc.setFill(Color.BLUE);
         gc.fillOval(px, py, size, size);
-
         gc.setStroke(Color.WHITE);
         gc.setLineWidth(2);
         gc.strokeOval(px, py, size, size);
     }
+
+
+    private void showDialogue(Pane root, String message) {
+        Label dialogue = new Label(message);
+        dialogue.setFont(Font.font("Consolas", 18));
+        dialogue.setTextFill(Color.WHITE);
+        dialogue.setStyle("-fx-background-color: rgba(0,0,0,0.8); -fx-padding: 10;");
+        dialogue.setLayoutX(40);
+        dialogue.setLayoutY((rows + 1) * tileSize - 80);
+        dialogue.setId("dialogue-box");
+        root.getChildren().add(dialogue);
+    }
+
 
 
     public static void main(String[] args) {
