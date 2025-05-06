@@ -18,6 +18,8 @@ import javafx.util.Duration;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MapBoundaryGame extends Application {
@@ -31,6 +33,8 @@ public class MapBoundaryGame extends Application {
     private int monsterY = 3;
     private boolean monsterAlive = true;
     private boolean inCombat = false;
+    private List<Monster> monsters = new ArrayList<>();
+
 
 
     private int health = 100;
@@ -51,6 +55,10 @@ public class MapBoundaryGame extends Application {
     public void start(Stage primaryStage) {
         Canvas canvas = new Canvas(cols * tileSize, (rows + 2) * tileSize);
         canvas.setTranslateY(tileSize);
+        monsters.add(new Monster("Goblin", 3, 3, 30));
+        monsters.add(new Monster("Orc", 5, 7, 50));
+        monsters.add(new Monster("Slime", 10, 2, 20));
+
         GraphicsContext gc = canvas.getGraphicsContext2D();
         drawMap(gc);
 
