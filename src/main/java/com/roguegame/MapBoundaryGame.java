@@ -182,9 +182,11 @@ public class MapBoundaryGame extends Application {
         double py = playerY * tileSize + 5;
         double size = tileSize - 10;
 
-        if (monsterAlive) {
-            gc.setFill(Color.CRIMSON);
-            gc.fillOval(monsterX * tileSize + 5, monsterY * tileSize + 5, tileSize - 10, tileSize - 10);
+        for (Monster monster : monsters) {
+            if (monster.isAlive()) {
+                gc.setFill(Color.CRIMSON);
+                gc.fillOval(monster.getX() * tileSize + 5, monster.getY() * tileSize + 5, tileSize - 10, tileSize - 10);
+            }
         }
 
         gc.setFill(Color.BLUE);
