@@ -44,17 +44,24 @@ public class MapBoundaryGame extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         drawMap(gc);
 
-        Label helpLabel = new Label("Use W/A/S/D or Arrow Keys to move");
-        helpLabel.setFont(new Font("Consolas", 18));
-        helpLabel.setTextFill(Color.LIGHTGRAY);
-        helpLabel.setTranslateY(rows * tileSize - 35);
-        helpLabel.setTranslateX(10);
-
         Label keyLabel = new Label("Last key pressed: ");
-        keyLabel.setFont(new Font("Consolas", 14));
+        keyLabel.setFont(Font.font("Consolas", 16));
         keyLabel.setTextFill(Color.YELLOW);
-        keyLabel.setTranslateY(rows * tileSize - 60);
-        keyLabel.setTranslateX(10);
+
+        Label helpLabel = new Label("Use W/A/S/D or Arrow Keys to move");
+        helpLabel.setFont(Font.font("Consolas", 16));
+        helpLabel.setTextFill(Color.LIGHTGRAY);
+
+        Pane overlay = new Pane(keyLabel, helpLabel);
+        overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);");
+        overlay.setPrefHeight(50);
+        overlay.setTranslateY(rows * tileSize - 50);
+        overlay.setMinWidth(cols * tileSize);
+
+        keyLabel.setLayoutX(20);
+        keyLabel.setLayoutY(5);
+        helpLabel.setLayoutX(20);
+        helpLabel.setLayoutY(25);
 
         FadeTransition fade = new FadeTransition(Duration.seconds(2), helpLabel);
         fade.setFromValue(0);
@@ -62,7 +69,7 @@ public class MapBoundaryGame extends Application {
         fade.setCycleCount(1);
         fade.play();
 
-        Pane root = new Pane(canvas, helpLabel, keyLabel);
+        Pane root = new Pane(canvas, overlay);
         Scene scene = new Scene(root);
 
         scene.setOnKeyPressed(event -> {
@@ -91,6 +98,7 @@ public class MapBoundaryGame extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
 
     private void drawMap(GraphicsContext gc) {
         for (int y = 0; y < rows; y++) {
