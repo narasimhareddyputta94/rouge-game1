@@ -36,7 +36,7 @@ public class MapBoundaryGame extends Application {
             {1,0,1,0,0,0,0,0,1,0,0,0,1,0,1},
             {1,0,1,0,1,1,1,1,1,0,1,0,1,0,1},
             {1,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+            {1,1,1,1,0,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,1,1,1,1,1,1,1,1,1,1,1,0,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
@@ -44,7 +44,8 @@ public class MapBoundaryGame extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Canvas canvas = new Canvas(cols * tileSize, rows * tileSize);
+        Canvas canvas = new Canvas(cols * tileSize, (rows + 2) * tileSize);
+        canvas.setTranslateY(tileSize);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         drawMap(gc);
 
@@ -59,7 +60,7 @@ public class MapBoundaryGame extends Application {
         Pane overlay = new Pane(keyLabel, helpLabel);
         overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);");
         overlay.setPrefHeight(50);
-        overlay.setTranslateY(rows * tileSize - 50);
+        overlay.setTranslateY((rows + 1) * tileSize);
         overlay.setMinWidth(cols * tileSize);
         keyLabel.setLayoutX(20);
         keyLabel.setLayoutY(5);
