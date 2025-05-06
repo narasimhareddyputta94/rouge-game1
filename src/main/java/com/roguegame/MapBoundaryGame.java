@@ -51,6 +51,8 @@ public class MapBoundaryGame extends Application {
     public void start(Stage primaryStage) {
         Canvas canvas = new Canvas(cols * tileSize, (rows + 2) * tileSize);
         canvas.setTranslateY(tileSize);
+
+        // Initialize monsters
         monsters.add(new Monster("Goblin", 3, 3, 30));
         monsters.add(new Monster("Orc", 5, 7, 50));
         monsters.add(new Monster("Slime", 10, 2, 20));
@@ -141,7 +143,7 @@ public class MapBoundaryGame extends Application {
 
             drawMap(gc);
 
-            // Monster encounter logic
+            // Monster encounter
             if (!inCombat) {
                 for (Monster m : monsters) {
                     if (m.isAlive() && m.getX() == playerX && m.getY() == playerY) {
@@ -154,8 +156,10 @@ public class MapBoundaryGame extends Application {
                 }
             }
 
-            if (inCombat && event.getCode().toString().equals("SPACE") && activeMonster != null) {
-                activeMonster.damage(10);
+            // Combat: attack on SPACE
+            if (inCombat && key.equals("SPACE") && activeMonster != null) {
+                int damage = 5 + (int)(Math.random() * 11);
+                activeMonster.damage(damage);
 
                 root.getChildren().removeIf(n -> n.getId() != null && n.getId().equals("dialogue-box"));
 
@@ -164,15 +168,22 @@ public class MapBoundaryGame extends Application {
                     inCombat = false;
                     activeMonster = null;
                 } else {
-                    showDialogue(root, "You hit the " + activeMonster.getName() + "! Remaining HP: " + activeMonster.getHealth());
+                    showDialogue(root, "You hit the " + activeMonster.getName() + " for " + damage + " damage! Remaining HP: " + activeMonster.getHealth());
                 }
 
                 drawMap(gc);
-            }
 
+                // 💥 Flash animation on hit
+                FadeTransition flash = new FadeTransition(Duration.millis(100), canvas);
+                flash.setFromValue(1.0);
+                flash.setToValue(0.6);
+                flash.setAutoReverse(true);
+                flash.setCycleCount(2);
+                flash.play();
+            }
         });
 
-        primaryStage.setTitle("JavaFX Rogue Game – Multi Monster Dialogue");
+        primaryStage.setTitle("JavaFX Rogue Game – Monster Combat + Flash Effect");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
