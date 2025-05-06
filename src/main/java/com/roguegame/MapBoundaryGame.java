@@ -1,6 +1,9 @@
 package com.roguegame;
 
 import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,12 +18,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class MapBoundaryGame extends Application {
 
@@ -29,13 +29,9 @@ public class MapBoundaryGame extends Application {
     private final int cols = 15;
     private int playerX = 1;
     private int playerY = 1;
-    private int monsterX = 3;
-    private int monsterY = 3;
-    private boolean monsterAlive = true;
     private boolean inCombat = false;
+    private Monster activeMonster = null;
     private List<Monster> monsters = new ArrayList<>();
-
-
 
     private int health = 100;
     private final int[][] map = {
@@ -89,11 +85,11 @@ public class MapBoundaryGame extends Application {
         ProgressBar healthBar = new ProgressBar(1.0);
         healthBar.setPrefWidth(cols * tileSize - 40);
         healthBar.setStyle("""
-        -fx-accent: linear-gradient(to right, limegreen, green);
-        -fx-background-radius: 10;
-        -fx-border-radius: 10;
-        -fx-border-color: white;
-        -fx-border-width: 1;
+            -fx-accent: linear-gradient(to right, limegreen, green);
+            -fx-background-radius: 10;
+            -fx-border-radius: 10;
+            -fx-border-color: white;
+            -fx-border-width: 1;
         """);
 
         Label hpLabel = new Label("❤ Health: 100 / 100");
@@ -125,11 +121,7 @@ public class MapBoundaryGame extends Application {
                 );
                 timeline.play();
 
-                if (health <= 30) {
-                    hpLabel.setTextFill(Color.ORANGERED);
-                } else {
-                    hpLabel.setTextFill(Color.LIME);
-                }
+                hpLabel.setTextFill(health <= 30 ? Color.ORANGERED : Color.LIME);
             }
 
             int newX = playerX;
@@ -149,23 +141,21 @@ public class MapBoundaryGame extends Application {
 
             drawMap(gc);
 
-            if (!inCombat && monsterAlive && playerX == monsterX && playerY == monsterY) {
-                inCombat = true;
-                showDialogue(root, "You encountered a Goblin! Press SPACE to attack.");
-            }
-
-            if (inCombat && event.getCode().toString().equals("SPACE")) {
-                monsterAlive = false;
-                inCombat = false;
-
-                root.getChildren().removeIf(node -> node.getId() != null && node.getId().equals("dialogue-box"));
-                showDialogue(root, "You defeated the Goblin!");
-                drawMap(gc);
+            // Monster encounter logic
+            if (!inCombat) {
+                for (Monster m : monsters) {
+                    if (m.isAlive() && m.getX() == playerX && m.getY() == playerY) {
+                        inCombat = true;
+                        activeMonster = m;
+                        root.getChildren().removeIf(n -> n.getId() != null && n.getId().equals("dialogue-box"));
+                        showDialogue(root, "You encountered a " + m.getName() + "! HP: " + m.getHealth() + ". Press SPACE to attack.");
+                        break;
+                    }
+                }
             }
         });
 
-
-        primaryStage.setTitle("JavaFX Rogue Game – Beautiful HP UI");
+        primaryStage.setTitle("JavaFX Rogue Game – Multi Monster Dialogue");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -178,10 +168,6 @@ public class MapBoundaryGame extends Application {
             }
         }
 
-        double px = playerX * tileSize + 5;
-        double py = playerY * tileSize + 5;
-        double size = tileSize - 10;
-
         for (Monster monster : monsters) {
             if (monster.isAlive()) {
                 gc.setFill(Color.CRIMSON);
@@ -189,13 +175,16 @@ public class MapBoundaryGame extends Application {
             }
         }
 
+        double px = playerX * tileSize + 5;
+        double py = playerY * tileSize + 5;
+        double size = tileSize - 10;
+
         gc.setFill(Color.BLUE);
         gc.fillOval(px, py, size, size);
         gc.setStroke(Color.WHITE);
         gc.setLineWidth(2);
         gc.strokeOval(px, py, size, size);
     }
-
 
     private void showDialogue(Pane root, String message) {
         Label dialogue = new Label(message);
@@ -207,8 +196,6 @@ public class MapBoundaryGame extends Application {
         dialogue.setId("dialogue-box");
         root.getChildren().add(dialogue);
     }
-
-
 
     public static void main(String[] args) {
         launch(args);
