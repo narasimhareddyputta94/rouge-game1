@@ -2,16 +2,23 @@ package com.roguegame;
 
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+
 
 public class MapBoundaryGame extends Application {
 
@@ -21,6 +28,7 @@ public class MapBoundaryGame extends Application {
     private int playerX = 1;
     private int playerY = 1;
 
+    private int health = 100;
     private final int[][] map = {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,0,1,0,0,0,0,0,0,0,1},
@@ -33,10 +41,6 @@ public class MapBoundaryGame extends Application {
             {1,0,1,1,1,1,1,1,1,1,1,1,1,0,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
     };
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -57,7 +61,6 @@ public class MapBoundaryGame extends Application {
         overlay.setPrefHeight(50);
         overlay.setTranslateY(rows * tileSize - 50);
         overlay.setMinWidth(cols * tileSize);
-
         keyLabel.setLayoutX(20);
         keyLabel.setLayoutY(5);
         helpLabel.setLayoutX(20);
@@ -69,12 +72,52 @@ public class MapBoundaryGame extends Application {
         fade.setCycleCount(1);
         fade.play();
 
-        Pane root = new Pane(canvas, overlay);
+        ProgressBar healthBar = new ProgressBar(1.0);
+        healthBar.setPrefWidth(cols * tileSize - 40);
+        healthBar.setStyle("""
+        -fx-accent: linear-gradient(to right, limegreen, green);
+        -fx-background-radius: 10;
+        -fx-border-radius: 10;
+        -fx-border-color: white;
+        -fx-border-width: 1;
+        """);
+
+        Label hpLabel = new Label("❤ Health: 100 / 100");
+        hpLabel.setFont(Font.font("Consolas", 20));
+        hpLabel.setTextFill(Color.web("#00FF00"));
+        hpLabel.setStyle("-fx-effect: dropshadow(gaussian, black, 2, 0, 1, 1);");
+
+        VBox healthDisplay = new VBox(hpLabel, healthBar);
+        healthDisplay.setLayoutX(20);
+        healthDisplay.setLayoutY(10);
+        healthDisplay.setSpacing(5);
+        healthDisplay.setAlignment(Pos.CENTER_LEFT);
+
+        Pane root = new Pane(canvas, overlay, healthDisplay);
         Scene scene = new Scene(root);
 
-        scene.setOnKeyPressed(event -> {
+        scene.setOnKeyPressed((KeyEvent event) -> {
             String key = event.getCode().toString();
             keyLabel.setText("Last key pressed: " + key);
+
+            if (key.equals("H")) {
+                health = Math.max(0, health - 10);
+                hpLabel.setText("❤ Health: " + health + " / 100");
+
+                // Animate smooth progress bar reduction
+                double progress = health / 100.0;
+                Timeline timeline = new Timeline(
+                        new KeyFrame(Duration.seconds(0.2),
+                                new KeyValue(healthBar.progressProperty(), progress))
+                );
+                timeline.play();
+
+                if (health <= 30) {
+                    hpLabel.setTextFill(Color.ORANGERED);
+                } else {
+                    hpLabel.setTextFill(Color.LIME);
+                }
+            }
 
             int newX = playerX;
             int newY = playerY;
@@ -94,11 +137,10 @@ public class MapBoundaryGame extends Application {
             drawMap(gc);
         });
 
-        primaryStage.setTitle("JavaFX Rogue Game – Polished Movement");
+        primaryStage.setTitle("JavaFX Rogue Game – Beautiful HP UI");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
 
     private void drawMap(GraphicsContext gc) {
         for (int y = 0; y < rows; y++) {
@@ -108,7 +150,20 @@ public class MapBoundaryGame extends Application {
             }
         }
 
+        double px = playerX * tileSize + 5;
+        double py = playerY * tileSize + 5;
+        double size = tileSize - 10;
+
         gc.setFill(Color.BLUE);
-        gc.fillOval(playerX * tileSize + 5, playerY * tileSize + 5, tileSize - 10, tileSize - 10);
+        gc.fillOval(px, py, size, size);
+
+        gc.setStroke(Color.WHITE);
+        gc.setLineWidth(2);
+        gc.strokeOval(px, py, size, size);
+    }
+
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }
