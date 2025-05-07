@@ -143,7 +143,6 @@ public class MapBoundaryGame extends Application {
 
             drawMap(gc);
 
-            // Monster encounter
             if (!inCombat) {
                 for (Monster m : monsters) {
                     if (m.isAlive() && m.getX() == playerX && m.getY() == playerY) {
@@ -156,7 +155,6 @@ public class MapBoundaryGame extends Application {
                 }
             }
 
-            // Combat: attack on SPACE
             if (inCombat && key.equals("SPACE") && activeMonster != null) {
                 int damage = 5 + (int)(Math.random() * 11);
                 activeMonster.damage(damage);
@@ -169,11 +167,37 @@ public class MapBoundaryGame extends Application {
                     activeMonster = null;
                 } else {
                     showDialogue(root, "You hit the " + activeMonster.getName() + " for " + damage + " damage! Remaining HP: " + activeMonster.getHealth());
+
+                    // Monster counterattacks
+                    int counterDamage = 5 + (int)(Math.random() * 11);
+                    health = Math.max(0, health - counterDamage);
+                    hpLabel.setText("❤ Health: " + health + " / 100");
+
+                    double progress = health / 100.0;
+                    Timeline timeline = new Timeline(
+                            new KeyFrame(Duration.seconds(0.3),
+                                    new KeyValue(healthBar.progressProperty(), progress))
+                    );
+                    timeline.play();
+
+                    hpLabel.setTextFill(health <= 30 ? Color.ORANGERED : Color.LIME);
+
+                    FadeTransition redFlash = new FadeTransition(Duration.millis(100), canvas);
+                    redFlash.setFromValue(1.0);
+                    redFlash.setToValue(0.3);
+                    redFlash.setAutoReverse(true);
+                    redFlash.setCycleCount(2);
+                    redFlash.play();
+
+                    if (health == 0) {
+                        showDialogue(root, "You were defeated by " + activeMonster.getName() + "!");
+                        inCombat = false;
+                        activeMonster = null;
+                    }
                 }
 
                 drawMap(gc);
 
-                // 💥 Flash animation on hit
                 FadeTransition flash = new FadeTransition(Duration.millis(100), canvas);
                 flash.setFromValue(1.0);
                 flash.setToValue(0.6);
@@ -181,6 +205,7 @@ public class MapBoundaryGame extends Application {
                 flash.setCycleCount(2);
                 flash.play();
             }
+
         });
 
         primaryStage.setTitle("JavaFX Rogue Game – Monster Combat + Flash Effect");
