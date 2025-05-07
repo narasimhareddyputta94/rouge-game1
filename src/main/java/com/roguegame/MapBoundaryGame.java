@@ -54,7 +54,7 @@ public class MapBoundaryGame extends Application {
 
         monsters.add(new Monster("Goblin", 2, 5, 30));
         monsters.add(new Monster("Orc", 9, 4, 50));
-        monsters.add(new Monster("Slime", 9, 1, 20));
+        monsters.add(new Monster("Slime", 9, 1, 50));
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
         drawMap(gc);
@@ -144,6 +144,26 @@ public class MapBoundaryGame extends Application {
                 return;
             }
 
+            if (key.equals("R") && monsters.stream().noneMatch(Monster::isAlive)) {
+                root.getChildren().removeIf(n -> "victory".equals(n.getId()));
+                playerX = 1;
+                playerY = 1;
+                health = 100;
+                hpLabel.setText("❤ Health: 100 / 100");
+                hpLabel.setTextFill(Color.LIME);
+                healthBar.setProgress(1.0);
+                inCombat = false;
+                activeMonster = null;
+
+                for (Monster m : monsters) {
+                    m.reset();
+                }
+
+                drawMap(gc);
+                return;
+            }
+
+
 
             int newX = playerX;
             int newY = playerY;
@@ -180,11 +200,10 @@ public class MapBoundaryGame extends Application {
 
                 root.getChildren().removeIf(n -> n.getId() != null && n.getId().equals("dialogue-box"));
 
-                if (!activeMonster.isAlive()) {
-                    showDialogue(root, "You defeated the " + activeMonster.getName() + "!");
-                    inCombat = false;
-                    activeMonster = null;
-                } else {
+                if (monsters.stream().noneMatch(Monster::isAlive)) {
+                    showVictory(root);
+                }
+                else {
                     showDialogue(root, "You hit the " + activeMonster.getName() + " for " + damage + " damage! Remaining HP: " + activeMonster.getHealth());
 
                     int counterDamage = 5 + (int)(Math.random() * 11);
@@ -286,6 +305,27 @@ public class MapBoundaryGame extends Application {
 
         root.getChildren().addAll(gameOver, restart);
     }
+
+    private void showVictory(Pane root) {
+        Label victory = new Label("🏆 YOU WIN!");
+        victory.setFont(Font.font("Consolas", 36));
+        victory.setTextFill(Color.LIMEGREEN);
+        victory.setStyle("-fx-background-color: rgba(0,0,0,0.8); -fx-padding: 20;");
+        victory.setLayoutX(100);
+        victory.setLayoutY(200);
+
+        Label restart = new Label("Press R to play again");
+        restart.setFont(Font.font("Consolas", 20));
+        restart.setTextFill(Color.LIGHTGRAY);
+        restart.setLayoutX(120);
+        restart.setLayoutY(260);
+
+        victory.setId("victory");
+        restart.setId("victory");
+
+        root.getChildren().addAll(victory, restart);
+    }
+
 
     public static void main(String[] args) {
         launch(args);
