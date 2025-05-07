@@ -23,11 +23,13 @@ public class Monster {
     public boolean isAlive() { return alive; }
 
     public void damage(int amount) {
-        health -= amount;
-        if (health <= 0) {
+        if (!alive) return;
+        health = Math.max(0, health - amount);
+        if (health == 0) {
             alive = false;
         }
     }
+
 
     public void reset() {
         this.health = originalHealth;

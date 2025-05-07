@@ -86,12 +86,13 @@ public class MapBoundaryGame extends Application {
         ProgressBar healthBar = new ProgressBar(1.0);
         healthBar.setPrefWidth(cols * tileSize - 40);
         healthBar.setStyle("""
-            -fx-accent: linear-gradient(to right, limegreen, green);
+            -fx-accent: limegreen;
             -fx-background-radius: 10;
             -fx-border-radius: 10;
             -fx-border-color: white;
             -fx-border-width: 1;
         """);
+
 
         Label hpLabel = new Label("❤ Health: 100 / 100");
         hpLabel.setFont(Font.font("Consolas", 20));
@@ -204,7 +205,8 @@ public class MapBoundaryGame extends Application {
                     showVictory(root);
                 }
                 else {
-                    showDialogue(root, "You hit the " + activeMonster.getName() + " for " + damage + " damage! Remaining HP: " + activeMonster.getHealth());
+                    showDialogue(root, "You hit the " + activeMonster.getName() +
+                            " for " + damage + " damage! Remaining HP: " + Math.max(0, activeMonster.getHealth()));
 
                     int counterDamage = 5 + (int)(Math.random() * 11);
                     health = Math.max(0, health - counterDamage);
