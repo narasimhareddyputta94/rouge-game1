@@ -52,10 +52,10 @@ public class MapBoundaryGame extends Application {
         Canvas canvas = new Canvas(cols * tileSize, (rows + 2) * tileSize);
         canvas.setTranslateY(tileSize);
 
-        // Initialize monsters
-        monsters.add(new Monster("Goblin", 3, 3, 30));
-        monsters.add(new Monster("Orc", 5, 7, 50));
-        monsters.add(new Monster("Slime", 10, 2, 20));
+        monsters.add(new Monster("Goblin", 2, 5, 30));
+        monsters.add(new Monster("Orc", 9, 4, 50));
+        monsters.add(new Monster("Slime", 9, 1, 20));
+
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
         drawMap(gc);
