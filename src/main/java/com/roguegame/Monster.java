@@ -1,8 +1,9 @@
 package com.roguegame;
 
 public class Monster {
-    private String name;
-    private int x, y;
+    private final String name;
+    private final int x, y;
+    private final int originalHealth;
     private int health;
     private boolean alive;
 
@@ -11,6 +12,7 @@ public class Monster {
         this.x = x;
         this.y = y;
         this.health = health;
+        this.originalHealth = health;
         this.alive = true;
     }
 
@@ -25,5 +27,10 @@ public class Monster {
         if (health <= 0) {
             alive = false;
         }
+    }
+
+    public void reset() {
+        this.health = originalHealth;
+        this.alive = true;
     }
 }

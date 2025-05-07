@@ -56,7 +56,6 @@ public class MapBoundaryGame extends Application {
         monsters.add(new Monster("Orc", 9, 4, 50));
         monsters.add(new Monster("Slime", 9, 1, 20));
 
-
         GraphicsContext gc = canvas.getGraphicsContext2D();
         drawMap(gc);
 
@@ -168,7 +167,6 @@ public class MapBoundaryGame extends Application {
                 } else {
                     showDialogue(root, "You hit the " + activeMonster.getName() + " for " + damage + " damage! Remaining HP: " + activeMonster.getHealth());
 
-                    // Monster counterattacks
                     int counterDamage = 5 + (int)(Math.random() * 11);
                     health = Math.max(0, health - counterDamage);
                     hpLabel.setText("❤ Health: " + health + " / 100");
@@ -190,7 +188,7 @@ public class MapBoundaryGame extends Application {
                     redFlash.play();
 
                     if (health == 0) {
-                        showDialogue(root, "You were defeated by " + activeMonster.getName() + "!");
+                        showGameOver(root);
                         inCombat = false;
                         activeMonster = null;
                     }
@@ -205,7 +203,6 @@ public class MapBoundaryGame extends Application {
                 flash.setCycleCount(2);
                 flash.play();
             }
-
         });
 
         primaryStage.setTitle("JavaFX Rogue Game – Monster Combat + Flash Effect");
@@ -248,6 +245,26 @@ public class MapBoundaryGame extends Application {
         dialogue.setLayoutY((rows + 1) * tileSize - 80);
         dialogue.setId("dialogue-box");
         root.getChildren().add(dialogue);
+    }
+
+    private void showGameOver(Pane root) {
+        Label gameOver = new Label("\u2620 GAME OVER \u2620");
+        gameOver.setFont(Font.font("Consolas", 36));
+        gameOver.setTextFill(Color.RED);
+        gameOver.setStyle("-fx-background-color: rgba(0,0,0,0.8); -fx-padding: 20;");
+        gameOver.setLayoutX(100);
+        gameOver.setLayoutY(200);
+
+        Label restart = new Label("Press R to restart");
+        restart.setFont(Font.font("Consolas", 20));
+        restart.setTextFill(Color.LIGHTGRAY);
+        restart.setLayoutX(130);
+        restart.setLayoutY(260);
+
+        gameOver.setId("game-over");
+        restart.setId("game-over");
+
+        root.getChildren().addAll(gameOver, restart);
     }
 
     public static void main(String[] args) {
