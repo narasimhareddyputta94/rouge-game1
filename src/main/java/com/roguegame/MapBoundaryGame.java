@@ -125,6 +125,26 @@ public class MapBoundaryGame extends Application {
                 hpLabel.setTextFill(health <= 30 ? Color.ORANGERED : Color.LIME);
             }
 
+            if (key.equals("R") && health == 0) {
+                root.getChildren().removeIf(n -> "game-over".equals(n.getId()));
+                playerX = 1;
+                playerY = 1;
+                health = 100;
+                hpLabel.setText("❤ Health: 100 / 100");
+                hpLabel.setTextFill(Color.LIME);
+                healthBar.setProgress(1.0);
+                inCombat = false;
+                activeMonster = null;
+
+                for (Monster m : monsters) {
+                    m.reset();
+                }
+
+                drawMap(gc);
+                return;
+            }
+
+
             int newX = playerX;
             int newY = playerY;
 
